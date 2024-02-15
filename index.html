@@ -1,0 +1,120 @@
+<!-- index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anonymous Messaging</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Anonymous Messaging</h2>
+        <ul class="message-list" id="message-list"></ul>
+        <div class="form-group">
+            <textarea id="message-input" placeholder="Type your message here..."></textarea>
+        </div>
+        <button onclick="sendMessage()">Send Message</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+css
+Copy code
+/* styles.css */
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.message-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.message {
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+}
+
+.message p {
+    margin: 0;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+textarea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    resize: none;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+javascript
+Copy code
+// script.js
+
+document.addEventListener('DOMContentLoaded', function() {
+  fetchMessages();
+});
+
+function fetchMessages() {
+  fetch('/api/messages')
+    .then(response => response.json())
+    .then(messages => {
+      const messageList = document.getElementById('message-list');
+      messageList.innerHTML = '';
+      messages.forEach(message => {
+        const listItem = document.createElement('li');
+        listItem.className = 'message';
+        listItem.innerHTML = '<p>' + message.text + '</p>';
+        messageList.appendChild(listItem);
+      });
+    });
+}
+
+function sendMessage() {
+  const messageInput = document.getElementById('message-input');
+  const messageText = messageInput.value.trim();
+
+  if (messageText !== '') {
+    fetch('/api/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ text: messageText })
+    })
+    .then(response => response.json())
+    .then(newMessage => {
+      fetchMessages();
+      messageInput.value = '';
+    });
+  }
+}
